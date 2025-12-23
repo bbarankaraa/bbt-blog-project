@@ -25,24 +25,24 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // login/register
-                        .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll() // herkes görebilir
-                        .requestMatchers(HttpMethod.POST, "/api/posts/**").hasRole("ADMIN") // post oluşturma sadece admin
-                        .requestMatchers(HttpMethod.PUT, "/api/posts/**").hasRole("ADMIN") // güncelleme admin
-                        .requestMatchers(HttpMethod.PATCH, "/api/posts/**").hasRole("ADMIN") // güncelleme admin
-                        .requestMatchers(HttpMethod.DELETE, "/api/posts/**").hasRole("ADMIN") // silme admin
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(csrf -> csrf.disable())
+        .cors(cors -> {})
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/posts/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.PUT, "/api/posts/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.PATCH, "/api/posts/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.DELETE, "/api/posts/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+            .anyRequest().authenticated()
+        )
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+    return http.build();
+}
 
     @Bean
     public PasswordEncoder passwordEncoder() {
